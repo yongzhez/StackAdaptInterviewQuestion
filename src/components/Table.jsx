@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { connect } from 'react-redux';
 
 import {
-  setDisplayList,
+  removeFromDisplayList,
   fetchDisplayList,
   addToDisplay
 } from '../reducer/table';
@@ -22,7 +22,7 @@ const StyledTable = styled.table`
 const Table = ({
   displayList,
   coinList,
-  setDisplayListAction,
+  removeFromDisplayListAction,
   fetchDisplayListAction,
   addToDisplayAction
 }) => {
@@ -31,6 +31,12 @@ const Table = ({
       addToDisplayAction(id);
     }
   };
+
+  const removeFromDisplay = (symbol) => {
+    if (displayList.length > 1) {
+      removeFromDisplayListAction(symbol);
+    }
+  }
 
   useEffect(() => {
     if (displayList === null) {
@@ -81,17 +87,8 @@ const Table = ({
                   <th>{info.name}</th>
                   <td>{info.symbol}</td>
                   <td>{`$${info.price}`}</td>
-                  <td
-                    onClick={() =>
-                      displayList.length > 1 &&
-                      setDisplayListAction(
-                        displayList.filter(
-                          (displayed) => displayed.symbol !== info.symbol
-                        )
-                      )
-                    }
-                  >
-                    REMOVE
+                  <td>
+                    <button onClick={() => removeFromDisplay(info.symbol)}>REMOVE</button>
                   </td>
                 </tr>
               ))
@@ -108,7 +105,7 @@ export default connect(
     coinList: state.table.coinList
   }),
   dispatch => ({
-    setDisplayListAction: (arr) => dispatch(setDisplayList(arr)),
+    removeFromDisplayListAction: (symbol) => dispatch(removeFromDisplayList(symbol)),
     fetchDisplayListAction: () => dispatch(fetchDisplayList()),
     addToDisplayAction: (id) => dispatch(addToDisplay(id))
   })

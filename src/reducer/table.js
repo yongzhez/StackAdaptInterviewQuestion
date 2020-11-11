@@ -5,8 +5,8 @@ import { formatQuotes } from "../utils/helpers";
 
 
 export const setDisplayList = createAction('table/SET_DISPLAY');
-export const setCoinList = createAction('table/SET_COIN_LIST');
-
+export const removeFromDisplayList = createAction('table/REMOVE_FROM_DISPLAY_LIST');
+const setCoinList = createAction('table/SET_COIN_LIST');
 const fetchCoinError = createAction('api/FETCH_COIN_ERROR');
 const fetchQuoteError = createAction('api/FETCH_QUOTE_ERROR');
 
@@ -24,7 +24,7 @@ export const fetchDisplayList = () => {
         })
         .catch((err) => dispatch(fetchCoinError(err)))
         .then((resp) => {
-          dispatch(setDisplayList(formatQuotes(resp.data.data)));
+          dispatch(setDisplayList(formatQuotes(resp.data.data).sort((a, b) => a.rank - b.rank)));
         })
         .catch((err) => dispatch(fetchQuoteError(err)));
     };
@@ -56,6 +56,9 @@ const table = createReducer(INITIAL_STATE, (builder) => {
     builder
         .addCase(setDisplayList, (state, action) => {
             state.displayList = action.payload
+        })
+        .addCase(removeFromDisplayList, (state, action) => {
+          state.displayList = state.displayList.filter((displayed) => displayed.symbol !== action.payload)
         })
         .addCase(setCoinList, (state, action) => {
             state.coinList = action.payload
