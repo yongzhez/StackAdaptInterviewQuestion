@@ -1,8 +1,6 @@
-# Getting Started with Create React App
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+The answer for the first part of the interview is included in the file `load-state.js`
 
 In the project directory, you can run the following after a `npm install`:
 
@@ -15,4 +13,3 @@ The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
 
-The answer for the first part of the interview is included in the file `load-state.js`
