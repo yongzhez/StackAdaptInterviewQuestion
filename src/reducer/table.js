@@ -35,7 +35,7 @@ export const fetchDisplayList = () => {
   };
 };
 
-export const addToDisplay = (id) => {
+export const addCoinToDisplay = (id) => {
   return (dispatch, getState) => {
     const displayList = getState().table.displayList;
     requestHandler

@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import {
   removeFromDisplayList,
   fetchDisplayList,
-  addToDisplay,
+  addCoinToDisplay,
 } from "../reducer/table";
 
 const StyledTable = styled.table`
@@ -24,11 +24,11 @@ const Table = ({
   coinList,
   removeFromDisplayListAction,
   fetchDisplayListAction,
-  addToDisplayAction,
+  addCoinToDisplayAction,
 }) => {
-  const addToDisplay = (id) => {
+  const addCoinToDisplay = (id) => {
     if (displayList.length < 10) {
-      addToDisplayAction(id);
+      addCoinToDisplayAction(id);
     }
   };
 
@@ -61,7 +61,7 @@ const Table = ({
         <select
           defaultValue={-1}
           onChange={(e) =>
-            e.target.value !== -1 && addToDisplay(e.target.value)
+            e.target.value !== -1 && addCoinToDisplay(e.target.value)
           }
         >
           <option value={-1}> -- select an option -- </option>
@@ -113,6 +113,6 @@ export default connect(
     removeFromDisplayListAction: (symbol) =>
       dispatch(removeFromDisplayList(symbol)),
     fetchDisplayListAction: () => dispatch(fetchDisplayList()),
-    addToDisplayAction: (id) => dispatch(addToDisplay(id)),
+    addCoinToDisplayAction: (id) => dispatch(addCoinToDisplay(id)),
   })
 )(Table);
