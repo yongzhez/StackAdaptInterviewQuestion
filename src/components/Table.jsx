@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
+import { connect } from 'react-redux';
 
-import requestHandler from "../utils/requests";
-import { formatQuotes } from "../utils/helpers";
+import {
+  setDisplayList,
+  fetchDisplayList,
+  addToDisplay
+} from '../reducer/table';
 
 const StyledTable = styled.table`
   margin-top: 16px;
@@ -15,64 +19,42 @@ const StyledTable = styled.table`
   }
 `;
 
-const Table = () => {
-  const [blockChainInfo, setblockChainInfo] = useState(null);
-  const [displayInfo, setDisplayInfo] = useState(null);
-
+const Table = ({
+  displayList,
+  coinList,
+  setDisplayListAction,
+  fetchDisplayListAction,
+  addToDisplayAction
+}) => {
   const addToDisplay = (id) => {
-    if (displayInfo.length < 10) {
-      requestHandler
-        .get(`/quotes?id=${id}`)
-        .then((resp) => {
-          const formattedArr = formatQuotes(resp.data.data);
-          setDisplayInfo(
-            [...displayInfo, ...formattedArr].sort((a, b) => a.rank - b.rank)
-          );
-        })
-        .catch((err) => console.log(err));
+    if (displayList.length < 10) {
+      addToDisplayAction(id);
     }
   };
 
   useEffect(() => {
-    requestHandler
-      .get("/map?sort=cmc_rank")
-      .then((resp) => {
-        const [first, second, third, fourth, fifth] = resp.data.data;
-        setblockChainInfo(resp.data.data);
-        const idString = [first, second, third, fourth, fifth]
-          .map((ele) => ele.id)
-          .join();
-        return requestHandler.get(`/quotes?id=${idString}`);
-      })
-      .catch((err) => console.log(err))
-      .then((resp) => {
-        setDisplayInfo(formatQuotes(resp.data.data));
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (displayList === null) {
+      fetchDisplayListAction();
+    }
+  });
 
-  if (!blockChainInfo || !displayInfo) {
+  if (!displayList || !coinList) {
     return null;
   }
 
-  const filteredCoins = blockChainInfo.filter(
+  const filteredCoins = coinList.filter(
     (info) =>
-      displayInfo.findIndex(
+      displayList.findIndex(
         (displayedInfo) => displayedInfo.symbol === info.symbol
       ) === -1
   );
 
   return (
     <>
-      {blockChainInfo && displayInfo ? (
-        <select
-          onChange={(e) =>
-            e.target.value !== -1 && addToDisplay(e.target.value)
-          }
-        >
-          <option selected value={-1}>
-            {" "}
-            -- select an option --{" "}
+      {coinList && displayList ? (
+        <select defaultValue={-1} onChange={(e) => e.target.value !== -1 && addToDisplay(e.target.value)}>
+          <option value={-1}>
+            {" "}-- select an option --{" "}
           </option>
           {filteredCoins.map((info) => (
             <option key={uuidv4()} value={info.id}>
@@ -84,16 +66,16 @@ const Table = () => {
       <StyledTable>
         <thead>
           <tr>
-            <th>rank</th>
-            <th>name</th>
-            <th>symbol</th>
-            <th>price</th>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Symbol</th>
+            <th>Price</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {displayInfo
-            ? displayInfo.map((info) => (
+          {displayList
+            ? displayList.map((info) => (
                 <tr key={uuidv4()}>
                   <td>{info.rank}</td>
                   <th>{info.name}</th>
@@ -101,9 +83,9 @@ const Table = () => {
                   <td>{`$${info.price}`}</td>
                   <td
                     onClick={() =>
-                      displayInfo.length > 1 &&
-                      setDisplayInfo(
-                        displayInfo.filter(
+                      displayList.length > 1 &&
+                      setDisplayListAction(
+                        displayList.filter(
                           (displayed) => displayed.symbol !== info.symbol
                         )
                       )
@@ -120,4 +102,14 @@ const Table = () => {
   );
 };
 
-export default Table;
+export default connect(
+  (state) => ({
+    displayList: state.table.displayList,
+    coinList: state.table.coinList
+  }),
+  dispatch => ({
+    setDisplayListAction: (arr) => dispatch(setDisplayList(arr)),
+    fetchDisplayListAction: () => dispatch(fetchDisplayList()),
+    addToDisplayAction: (id) => dispatch(addToDisplay(id))
+  })
+)(Table);
