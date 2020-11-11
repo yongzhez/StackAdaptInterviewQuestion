@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
 import {
   removeFromDisplayList,
   fetchDisplayList,
-  addToDisplay
-} from '../reducer/table';
+  addToDisplay,
+} from "../reducer/table";
 
 const StyledTable = styled.table`
   margin-top: 16px;
@@ -24,7 +24,7 @@ const Table = ({
   coinList,
   removeFromDisplayListAction,
   fetchDisplayListAction,
-  addToDisplayAction
+  addToDisplayAction,
 }) => {
   const addToDisplay = (id) => {
     if (displayList.length < 10) {
@@ -36,7 +36,7 @@ const Table = ({
     if (displayList.length > 1) {
       removeFromDisplayListAction(symbol);
     }
-  }
+  };
 
   useEffect(() => {
     if (displayList === null) {
@@ -58,10 +58,13 @@ const Table = ({
   return (
     <>
       {coinList && displayList ? (
-        <select defaultValue={-1} onChange={(e) => e.target.value !== -1 && addToDisplay(e.target.value)}>
-          <option value={-1}>
-            {" "}-- select an option --{" "}
-          </option>
+        <select
+          defaultValue={-1}
+          onChange={(e) =>
+            e.target.value !== -1 && addToDisplay(e.target.value)
+          }
+        >
+          <option value={-1}> -- select an option -- </option>
           {filteredCoins.map((info) => (
             <option key={uuidv4()} value={info.id}>
               {info.name}
@@ -88,7 +91,9 @@ const Table = ({
                   <td>{info.symbol}</td>
                   <td>{`$${info.price}`}</td>
                   <td>
-                    <button onClick={() => removeFromDisplay(info.symbol)}>REMOVE</button>
+                    <button onClick={() => removeFromDisplay(info.symbol)}>
+                      REMOVE
+                    </button>
                   </td>
                 </tr>
               ))
@@ -102,11 +107,12 @@ const Table = ({
 export default connect(
   (state) => ({
     displayList: state.table.displayList,
-    coinList: state.table.coinList
+    coinList: state.table.coinList,
   }),
-  dispatch => ({
-    removeFromDisplayListAction: (symbol) => dispatch(removeFromDisplayList(symbol)),
+  (dispatch) => ({
+    removeFromDisplayListAction: (symbol) =>
+      dispatch(removeFromDisplayList(symbol)),
     fetchDisplayListAction: () => dispatch(fetchDisplayList()),
-    addToDisplayAction: (id) => dispatch(addToDisplay(id))
+    addToDisplayAction: (id) => dispatch(addToDisplay(id)),
   })
 )(Table);
